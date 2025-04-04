@@ -6,9 +6,31 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
+
 
 class ProfileController extends Controller
 {
+
+    public function destroy(Request $request)
+    {
+        $request->validate([
+            'password' => ['required', 'current_password'],
+        ]);
+
+        $user = $request->user();
+
+        Auth::logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        $user->delete();
+
+        return redirect('/');
+    }
+
+
     public function edit()
     {
         return view('profile.edit', [
