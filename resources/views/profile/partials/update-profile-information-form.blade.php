@@ -13,9 +13,31 @@
         @csrf
     </form>
 
-    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6">
+    <form method="post" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="mt-6 space-y-6">
         @csrf
         @method('patch')
+
+        @php
+            $photoPath = $user->profile_photo_path ?? null;
+            $hasPhoto = !empty($photoPath) && $photoPath !== 'null';
+        @endphp
+
+
+        <div class="mt-6 mb-4">
+            <img src="{{ $hasPhoto
+                        ? asset('storage/' . $photoPath)
+                        : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=CCCCCC&color=333333&size=96' }}"
+                alt="Foto de perfil"
+                class="rounded-full object-cover border border-gray-300 dark:border-gray-700 shadow"
+                style="width: 96px; height: 96px; max-width: 96px; max-height: 96px;" />
+        </div>
+
+
+        <div>
+            <x-input-label for="profile_photo" :value="__('Profile Photo')" />
+            <input id="profile_photo" name="profile_photo" type="file" class="mt-1 block w-full" accept="image/*">
+            <x-input-error class="mt-2" :messages="$errors->get('profile_photo')" />
+        </div>
 
         <div>
             <x-input-label for="name" :value="__('Name')" />

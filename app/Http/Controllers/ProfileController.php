@@ -29,10 +29,18 @@ class ProfileController extends Controller
                 Rule::unique('users')->ignore($user->id),
             ],
             'password' => ['nullable', 'string', 'min:8'],
+            'profile_photo' => ['nullable', 'image', 'max:2048'], // max 2MB
         ]);
-
+        
+        if ($request->hasFile('profile_photo')) {
+            $path = $request->file('profile_photo')->store('profile_photos', 'public');
+            $user->profile_photo_path = $path;
+        }
+        
         $user->name = $validated['name'];
         $user->email = $validated['email'];
+
+        
 
         if (!empty($validated['password'])) {
             $user->password = Hash::make($validated['password']);
